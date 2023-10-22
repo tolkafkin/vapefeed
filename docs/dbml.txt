@@ -1,0 +1,98 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table feedbacks {
+  id integer [primary key]
+  liquid_id integer
+  body text [note: 'Content of the feedback']
+  created_at timestamp
+  score_id integer
+}
+
+Table scores {
+  id integer [primary key]
+  user_id integer
+  set_at timestamp
+  value integer
+}
+
+Table liquids_feedback_scores {
+  score_id integer
+  liquid_id integer
+}
+
+Table users_feedback_scores {
+  id integer [primary key]
+  score_id integer
+  feedback_id integer
+}
+
+Table users {
+  id integer [primary key]
+  username varchar
+  role varchar
+  created_at timestamp
+}
+
+Table profiles {
+  id integer [primary key]
+  user_id integer
+  description text [note: 'About of the user']
+  active_vape_id integer
+}
+
+Table liquids {
+  id integer [primary key]
+  manufacturer_id integer
+  strength integer
+  with_cold bool
+  product_line varchar
+  taste varchar
+}
+
+Table manufacturer_liquids {
+  id integer [primary key]
+  brand_name varchar
+  added_at timestamp
+}
+
+Table vapes {
+  id integer [primary key]
+  device_name varchar
+  manufacturer_id integer
+}
+
+Table manufacturer_vapes {
+  id integer [primary key]
+  brand_name varchar
+}
+
+Table vapes_profile {
+  id integer [primary key]
+  profile_id integer
+  vape_id integer
+}
+
+Ref: profiles.id <> vapes_profile.profile_id
+
+Ref: vapes.id <> vapes_profile.vape_id
+
+Ref: profiles.active_vape_id < vapes.id
+
+Ref: manufacturer_vapes.id < vapes.manufacturer_id
+
+Ref: liquids_feedback_scores.liquid_id <> liquids.id
+
+Ref: liquids_feedback_scores.score_id <> scores.id
+
+Ref: feedbacks.liquid_id - liquids.id
+
+Ref: manufacturer_liquids.id < liquids.manufacturer_id
+
+Ref: users.id - profiles.user_id
+
+Ref: users.id < scores.user_id
+
+Ref: feedbacks.id <> users_feedback_scores.feedback_id
+
+Ref: scores.id <> users_feedback_scores.score_id
