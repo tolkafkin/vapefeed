@@ -3,7 +3,7 @@ name: VapeFeed CI
 on:
   push:
     tags:
-      - main
+      - master
 #    branches:
 #      - main
 
