@@ -8,3 +8,9 @@ class Feedback(models.Model):
     body = models.TextField(blank=True, verbose_name='Текст')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
 
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return f'{self.title} - {self.vape_profile}'

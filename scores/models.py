@@ -11,10 +11,24 @@ class Score(models.Model):
     value = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)],
                                              verbose_name='Рейтинг')
 
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+
+    def __str__(self):
+        return f'{self.user.username} - {self.value}'
+
 
 class UserFeedbackScore(models.Model):
     score = models.ForeignKey('Score', on_delete=models.CASCADE, verbose_name='Рейтинг пользователя')
     feedback = models.ForeignKey('feedbacks.Feedback', on_delete=models.CASCADE, verbose_name='Отзыв')
+
+    class Meta:
+        verbose_name = 'Рейтинг отзыва'
+        verbose_name_plural = 'Рейтинги отзывов'
+
+    def __str__(self):
+        return f'{self.score} : {self.feedback.title}'
 
 
 class LiquidFeedbackScore(models.Model):

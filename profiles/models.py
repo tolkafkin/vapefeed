@@ -9,3 +9,10 @@ class Profile(models.Model):
                                 verbose_name='Пользователь')
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
     photo = models.ImageField(upload_to='user_photo', blank=True, null=True, verbose_name='Фото пользователя')
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = 'Профиль'
+        verbose_name_plural = 'Профили'
