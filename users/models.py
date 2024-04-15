@@ -14,8 +14,5 @@ class User(AbstractUser):
         (MODERATOR, 'модератор'),
         (ADMINISTRATOR, 'администратор'),
     ]
-
-    age = models.PositiveSmallIntegerField(validators=[MinValueValidator(18), MaxValueValidator(100)],
-                                           verbose_name='Возраст пользователя')
     role = models.CharField(max_length=50, choices=ROLE_CHOICES,
                             default=SIMPLE_USER, verbose_name='Роль пользователя')

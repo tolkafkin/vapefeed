@@ -3,13 +3,13 @@ from django.db import models
 
 class Vape(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название девайса')
-    manufacturer = models.ForeignKey('ManufacturerVapes', on_delete=models.CASCADE,
+    manufacturer = models.ForeignKey('ManufacturerVape', on_delete=models.CASCADE,
                                      verbose_name='Изготовитель девайса')
 
 
-class ManufacturerVapes(models.Model):
+class ManufacturerVape(models.Model):
     brand_name = models.CharField(max_length=200, verbose_name='Название изготовителя девайса')
-    time_created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
 
 
 class VapeProfile(models.Model):

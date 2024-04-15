@@ -14,9 +14,9 @@ class Score(models.Model):
 
 class UserFeedbackScore(models.Model):
     score = models.ForeignKey('Score', on_delete=models.CASCADE, verbose_name='Рейтинг пользователя')
-    feedback = models.ForeignKey('feedback.Feedback', on_delete=models.CASCADE, verbose_name='Отзыв')
+    feedback = models.ForeignKey('feedbacks.Feedback', on_delete=models.CASCADE, verbose_name='Отзыв')
 
 
 class LiquidFeedbackScore(models.Model):
     score = models.ForeignKey('Score', on_delete=models.CASCADE, verbose_name='Рейтинг пользователя')
-    liquid = models.ForeignKey('liquids.Liquids', on_delete=models.CASCADE, verbose_name='Жидкость')
+    liquid = models.ForeignKey('liquids.Liquid', on_delete=models.CASCADE, verbose_name='Жидкость')
