@@ -1,0 +1,77 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table user {
+  id integer [primary key]
+  username varchar
+  role varchar
+  age integer
+  created_at timestamp
+}
+
+Table profile {
+  id integer [primary key]
+  user_id integer [ref: > user.id] // one-to-one
+  description text
+  photo image
+}
+
+Table vape {
+  id integer [primary key]
+  name varchar
+  manufacturer_id integer [ref: > manufacturervapes.id] // ForeignKey
+}
+
+Table manufacturervapes {
+  id integer [primary key]
+  brand_name varchar
+  time_created timestamp
+}
+
+Table vapeprofile {
+  id integer [primary key]
+  profile integer [ref: > profile.id] // ForeignKey
+  vape integer [ref: > vape.id] // ForeignKey
+}
+
+Table liquids {
+  id integer [primary key]
+  name varchar
+  manufacturer integer [ref: > manufacturerliquids.id] // ForeignKey
+  strength integer
+  cold bool
+  taste varchar
+}
+
+Table manufacturerliquids {
+  id integer [primary key]
+  name varchar
+  time_created timestamp
+}
+
+Table feedback {
+  id integer [primary key]
+  vapeprofile integer [ref: > vapeprofile.id]
+  liquid integer [ref: > liquids.id]
+  body text
+  created_at timestamp
+}
+
+Table score {
+  id integer [primary key]
+  user integer [ref: > user.id]
+  set_at timestamp
+  value integer
+}
+
+Table user_feedback_score {
+  id integer [primary key]
+  score integer [ref: > score.id]
+  feedback integer [ref: > feedback.id]
+}
+
+Table liquid_score {
+  id integer [primary key]
+  score integer [ref: > score.id]
+  liquid integer [ref: > liquids.id]
+}
