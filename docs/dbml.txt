@@ -1,98 +1,77 @@
 // Use DBML to define your database structure
 // Docs: https://dbml.dbdiagram.io/docs
 
-Table feedbacks {
-  id integer [primary key]
-  liquid_id integer
-  body text [note: 'Content of the feedback']
-  created_at timestamp
-  score_id integer
-}
-
-Table scores {
-  id integer [primary key]
-  user_id integer
-  set_at timestamp
-  value integer
-}
-
-Table liquids_feedback_scores {
-  score_id integer
-  liquid_id integer
-}
-
-Table users_feedback_scores {
-  id integer [primary key]
-  score_id integer
-  feedback_id integer
-}
-
-Table users {
+Table user {
   id integer [primary key]
   username varchar
   role varchar
+  age integer
   created_at timestamp
 }
 
-Table profiles {
+Table profile {
   id integer [primary key]
-  user_id integer
-  description text [note: 'About of the user']
-  active_vape_id integer
+  user_id integer [ref: > user.id] // one-to-one
+  description text
+  photo image
+}
+
+Table vape {
+  id integer [primary key]
+  name varchar
+  manufacturer_id integer [ref: > manufacturervapes.id] // ForeignKey
+}
+
+Table manufacturervapes {
+  id integer [primary key]
+  brand_name varchar
+  time_created timestamp
+}
+
+Table vapeprofile {
+  id integer [primary key]
+  profile integer [ref: > profile.id] // ForeignKey
+  vape integer [ref: > vape.id] // ForeignKey
 }
 
 Table liquids {
   id integer [primary key]
-  manufacturer_id integer
+  name varchar
+  manufacturer integer [ref: > manufacturerliquids.id] // ForeignKey
   strength integer
-  with_cold bool
-  product_line varchar
+  cold bool
   taste varchar
 }
 
-Table manufacturer_liquids {
+Table manufacturerliquids {
   id integer [primary key]
-  brand_name varchar
-  added_at timestamp
+  name varchar
+  time_created timestamp
 }
 
-Table vapes {
+Table feedback {
   id integer [primary key]
-  device_name varchar
-  manufacturer_id integer
+  vapeprofile integer [ref: > vapeprofile.id]
+  liquid integer [ref: > liquids.id]
+  body text
+  created_at timestamp
 }
 
-Table manufacturer_vapes {
+Table score {
   id integer [primary key]
-  brand_name varchar
+  user integer [ref: > user.id]
+  set_at timestamp
+  value integer
 }
 
-Table vapes_profile {
+Table user_feedback_score {
   id integer [primary key]
-  profile_id integer
-  vape_id integer
+  score integer [ref: > score.id]
+  feedback integer [ref: > feedback.id]
 }
 
-Ref: profiles.id <> vapes_profile.profile_id
-
-Ref: vapes.id <> vapes_profile.vape_id
-
-Ref: profiles.active_vape_id < vapes.id
-
-Ref: manufacturer_vapes.id < vapes.manufacturer_id
-
-Ref: liquids_feedback_scores.liquid_id <> liquids.id
-
-Ref: liquids_feedback_scores.score_id <> scores.id
-
-Ref: feedbacks.liquid_id - liquids.id
-
-Ref: manufacturer_liquids.id < liquids.manufacturer_id
-
-Ref: users.id - profiles.user_id
-
-Ref: users.id < scores.user_id
-
-Ref: feedbacks.id <> users_feedback_scores.feedback_id
-
-Ref: scores.id <> users_feedback_scores.score_id
+Table liquid_score {
+  id integer [primary key]
+  score integer [ref: > score.id]
+  liquid integer [ref: > liquids.id]
+}
