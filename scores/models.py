@@ -21,7 +21,7 @@ class Score(models.Model):
 
 class UserFeedbackScore(models.Model):
     score = models.ForeignKey('Score', on_delete=models.CASCADE, verbose_name='Рейтинг пользователя')
-    feedback = models.ForeignKey('feedbacks.Feedback', on_delete=models.CASCADE, verbose_name='Отзыв')
+    feedback = models.ForeignKey('feedbacks.Feedback', related_name='users_feedbacks',on_delete=models.CASCADE, verbose_name='Отзыв')
 
     class Meta:
         verbose_name = 'Рейтинг отзыва'

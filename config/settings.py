@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'feedbacks.apps.FeedbacksConfig',
     'liquids.apps.LiquidsConfig',
     'profiles.apps.ProfilesConfig',
