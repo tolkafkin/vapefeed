@@ -3,11 +3,11 @@ from django.db import models
 
 class Vape(models.Model):
     name = models.CharField(max_length=200, verbose_name='Название девайса')
-    manufacturer = models.ForeignKey('ManufacturerVape', on_delete=models.CASCADE,
+    manufacturer = models.ForeignKey('ManufacturerVape', on_delete=models.CASCADE, related_name='vapes',
                                      verbose_name='Изготовитель девайса')
 
     def __str__(self):
-        return f'{self.name} - {self.manufacturer}'
+        return self.name
 
     class Meta:
         verbose_name = 'Вэйп'
@@ -33,7 +33,7 @@ class VapeProfile(models.Model):
     body = models.TextField(blank=True, null=True, verbose_name='Статья')
 
     def __str__(self):
-        return f'{self.profile} - {self.vape}'
+        return f'{self.profile} : {self.vape}'
 
     class Meta:
         verbose_name = 'Вэйп-профайл'
