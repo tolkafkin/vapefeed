@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Liquid, ManufacturerLiquid
 
-# Register your models here.
+
+admin.site.register(Liquid)
+admin.site.register(ManufacturerLiquid)
