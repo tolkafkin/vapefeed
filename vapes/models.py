@@ -38,3 +38,4 @@ class VapeProfile(models.Model):
     class Meta:
         verbose_name = 'Вэйп-профайл'
         verbose_name_plural = 'Вэйп-профайлы'
+        unique_together = [['profile', 'vape']]
