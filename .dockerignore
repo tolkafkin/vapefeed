@@ -1,0 +1,5 @@
+.github
+.gitignore
+db.sqlite3
+.python-version
+docs

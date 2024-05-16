@@ -1,0 +1,34 @@
+services:
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    volumes:
+      - .:/usr/src/app/
+    env_file:
+      - ./.env.dev
+    networks:
+      - vapefeed_network
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../vapefeed_data/pgdata/:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=vapefeed_db
+      - POSTGRES_USER=vapefeed
+      - POSTGRES_PASSWORD=1234
+    networks:
+      - vapefeed_network
+    restart: always
+
+networks:
+  vapefeed_network:
+    driver: bridge
