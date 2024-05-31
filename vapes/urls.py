@@ -1,15 +1,16 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 
-from .views import VapeViewSet, ManufacturerVapeViewSet, VapeProfileViewSet
+from vapes.views import ManufacturerVapeListAPIView, ManufacturerVapeDetailAPIView, VapeListAPIView, VapeDetailAPIView, \
+    VapeProfileListAPIView, VapeProfileDetailAPIView
 
-
-router = routers.DefaultRouter()
-router.register(r'vape', VapeViewSet, basename='vape')
-router.register(r'manufacturer', ManufacturerVapeViewSet, basename='manufacturer')
-router.register(r'profile-vape', VapeProfileViewSet, basename='profile_vape')
-
-
+app_name = 'vapes'
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', VapeListAPIView.as_view(), name='vape-list'),
+    path('<int:pk>/', VapeDetailAPIView.as_view(), name='vape'),
+
+    path('manufacturer/', ManufacturerVapeListAPIView.as_view(), name='manufacturer-list'),
+    path('manufacturer/<int:pk>/', ManufacturerVapeDetailAPIView.as_view(), name='manufacturer'),
+
+    path('profile/', VapeProfileListAPIView.as_view(), name='profile-list'),
+    path('profile/<int:pk>/', VapeProfileDetailAPIView.as_view(), name='profile'),
 ]
