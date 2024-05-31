@@ -1,159 +1,148 @@
-from django.shortcuts import render
-from drf_spectacular.utils import extend_schema_view, extend_schema
-from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .models import Vape, ManufacturerVape, VapeProfile
-from .serializers import VapeSerializer, ManufactureVapeSerializer, VapeProfileSerializer
-
-
-@extend_schema_view(
-    list=extend_schema(
-        summary="Получение списка вэйпов",
-        description="""
-        Этот эндпоинт необходим для получения списка всех вэйп девайсов находящихся в базе данных.
-        """,
-        tags=['Вэйп'],
-    ),
-    create=extend_schema(
-        summary='Добавление одного вэйпа',
-        description="""
-        Этот эндпоинт необходим для добавления одного вэйп девайса в базу данных.
-        """,
-        tags=['Вэйп'],
-    ),
-    retrieve=extend_schema(
-        summary='Получение одного вэйпа',
-        description="""
-        Этот эндпоинт необходим для просмотра и получения одного вэйп девайса.
-        """,
-        tags=['Вэйп'],
-    ),
-    update=extend_schema(
-        summary="Редактирование одного вэйпа",
-        description="""
-        Этот эндпоинт необходим для полного изменения информации (редактирования) одного вэйп девайса.
-        """,
-        tags=['Вэйп'],
-    ),
-    partial_update=extend_schema(
-        summary='Частичное редактирование одного вэйпа',
-        description="""
-        Этот эндпоинт необходим для частичного редактирования или некоторых пунктов информации у одного вэйп девайса.
-        """,
-        tags=['Вэйп'],
-    ),
-    destroy=extend_schema(
-        summary='Удаление одного вэйпа',
-        description="""
-        Этот эндпоинт необходим для полного удаления одного вэйп девайса.
-        """,
-        tags=['Вэйп'],
-    ),
-)
-class VapeViewSet(ModelViewSet):
-    serializer_class = VapeSerializer
-    queryset = Vape.objects.all()
+from vapes.models import ManufacturerVape, Vape, VapeProfile
+from vapes.serializers import ManufacturerVapeSerializer, VapeSerializer, VapeProfileSerializer
 
 
-@extend_schema_view(
-    list=extend_schema(
-        summary="Получение списка изготовителей вэйп девайсов",
-        description="""
-        Этот эндпоинт необходим для получения списка изготовителей вэйп девайсов.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-    create=extend_schema(
-        summary='Добавление изготовителя вэйп девайсов',
-        description="""
-        Этот эндпоинт необходим для добавления одного изготовителя вэйп девайсов.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-    retrieve=extend_schema(
-        summary='Получение одного изготовителя вэйп девайса',
-        description="""
-        Этот эндпоинт необходим для просмотра и получения одного изготовителя вэйп девайсов из базы данных.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-    update=extend_schema(
-        summary="Редактирование одного изготовителя вэйп девайса",
-        description="""
-        Этот эндпоинт необходим для редактирования изготовителя вэйп девайса.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-    partial_update=extend_schema(
-        summary='Частичное редактирование изготовителя вэйп девайса',
-        description="""
-        Этот эндпоинт необходим для частичного редактирования или некоторых пунктов информации у одного изготовителя 
-        вэйп девайса.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-    destroy=extend_schema(
-        summary='Удаление одного изготовителя вэйп девайса',
-        description="""
-        Этот эндпоинт необходим для полного удаления одного изготовителя вэйп девайса из базы данных.
-        """,
-        tags=['Изготовитель вэйпа'],
-    ),
-)
-class ManufacturerVapeViewSet(ModelViewSet):
-    serializer_class = ManufactureVapeSerializer
-    queryset = ManufacturerVape.objects.all()
+@extend_schema(request=ManufacturerVapeSerializer, tags=["Изготовитель вэйпа"])
+class ManufacturerVapeListAPIView(APIView):
+    @extend_schema(summary='Выдаёт список вендоров')
+    def get(self, request):
+        brands = ManufacturerVape.objects.all()
+        serializer = ManufacturerVapeSerializer(brands, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Создаёт новый вендер')
+    def post(self, request):
+        serializer = ManufacturerVapeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema_view(
-    list=extend_schema(
-        summary="Получение списка вэйп-профилей",
-        description="""
-        Этот эндпоинт необходим для получения списка всех вэйп-профилей, где содержится информация об пользователе и 
-        девайсе, которым он пользуется.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-    create=extend_schema(
-        summary='Добавление одного вэйп-профайла',
-        description="""
-        Этот эндпоинт необходим для добавления одного вэйп-профайла, связывает профиль пользователя с девайсом.
-        Связывает профиль пользователя с имеющимися в базе данных вэйп девайсов, без дубилкатов.
-        Например:
-            1 профиль - 1 девайс под номер 103,
-            Нельзя связать этот же профиль с этим же девайсов под номером 103.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-    retrieve=extend_schema(
-        summary='Получение одного вэйп-профайла',
-        description="""
-        Этот эндпоинт необходим для просмотра вэйп-профайла и содержащейся в нём информации.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-    update=extend_schema(
-        summary="Редактирование одного вэйп-профайла",
-        description="""
-        Этот эндпоинт необходим для редактирования одного вэйп-профайла и содержащейся в нём информации.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-    partial_update=extend_schema(
-        summary='Частичное редактирование одного вэйп-профайла',
-        description="""
-        Этот эндпоинт необходим для частичного редактирования или некоторых пунктов информации у одного вэйп-профайла.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-    destroy=extend_schema(
-        summary='Удаление одного вэйп-профайла',
-        description="""
-        Этот эндпоинт необходим для полного удаления одного вэйп-профайла.
-        """,
-        tags=['Вэйп-профайл'],
-    ),
-)
-class VapeProfileViewSet(ModelViewSet):
-    serializer_class = VapeProfileSerializer
-    queryset = VapeProfile.objects.all()
+@extend_schema(request=ManufacturerVapeSerializer, tags=["Изготовитель вэйпа"])
+class ManufacturerVapeDetailAPIView(APIView):
+    @extend_schema(summary='Получение вендера')
+    def get(self, request, pk):
+        brand = ManufacturerVape.objects.get(pk=pk)
+        serializer = ManufacturerVapeSerializer(brand)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Редактирование вендора')
+    def put(self, request, pk):
+        brand = ManufacturerVape.objects.get(pk=pk)
+        serializer = ManufacturerVapeSerializer(brand, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(summary='Частичное редактирование вендора')
+    def patch(self, request, pk):
+        brand = ManufacturerVape.objects.get(pk=pk)
+        serializer = ManufacturerVapeSerializer(brand, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(summary='Удаление вендора')
+    def delete(self, request, pk):
+        brand = ManufacturerVape.objects.get(pk=pk)
+        brand.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(request=VapeSerializer, tags=['Вэйп'])
+class VapeListAPIView(APIView):
+    @extend_schema(summary='Получение всех вэйпов')
+    def get(self, request):
+        devices = Vape.objects.all()
+        serializer = VapeSerializer(devices, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Создание вэйпа')
+    def post(self, request):
+        serializer = VapeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(request=VapeSerializer, tags=['Вэйп'])
+class VapeDetailAPIView(APIView):
+    @extend_schema(summary='Получение вэйпа')
+    def get(self, request, pk):
+        device = Vape.objects.get(pk=pk)
+        serializer = VapeSerializer(device)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Редактирование вэйпа')
+    def put(self, request, pk):
+        device = Vape.objects.get(pk=pk)
+        serializer = VapeSerializer(device, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(summary='Частичное редактирование вэйпа')
+    def patch(self, request, pk):
+        device = Vape.objects.get(pk=pk)
+        serializer = VapeSerializer(device, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(summary='Удаление вэйпа')
+    def delete(self, request, pk):
+        device = Vape.objects.get(pk=pk)
+        device.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(request=VapeProfileSerializer, tags=['Вэйп-Профиль'])
+class VapeProfileListAPIView(APIView):
+    @extend_schema(summary='Получение списка вэйп-профилей')
+    def get(self, request):
+        vape_profiles = VapeProfile.objects.all()
+        serializer = VapeProfileSerializer(vape_profiles, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Создание вэйп-профиля')
+    def post(self, request):
+        serializer = VapeProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(request=VapeProfileSerializer, tags=['Вэйп-Профиль'])
+class VapeProfileDetailAPIView(APIView):
+    @extend_schema(summary='Получение вэйп-профиля')
+    def get(self, request, pk):
+        vape_profile = VapeProfile.objects.get(pk=pk)
+        serializer = VapeProfileSerializer(vape_profile)
+        return Response(serializer.data)
+
+    @extend_schema(summary='Частичное редактирование вэйп-профиля')
+    def patch(self, request, pk):
+        vape_profile = VapeProfile.objects.get(pk=pk)
+        serializer = VapeProfileSerializer(vape_profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(summary='Удаление вэйп-профиля')
+    def delete(self, request, pk):
+        vape_profile = VapeProfile.objects.get(pk=pk)
+        vape_profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
